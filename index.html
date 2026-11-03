@@ -782,6 +782,54 @@ a.sale-title:hover { text-decoration: underline; }
 .io-text { flex: 1 1 260px; display: grid; gap: 2px; font-size: 13px; }
 .io-text span { color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
 .io-btns { display: flex; gap: 8px; }
+.links .link-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px 0 2px; }
+.link-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--gray-100); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--ink); text-decoration: none; min-width: 0; transition: background var(--ease); }
+.link-item:hover { background: var(--gray-50); }
+.link-mark { width: 20px; height: 20px; border-radius: 5px; background: var(--pri-500); color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.link-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-edit-row { display: flex; align-items: center; gap: 6px; padding: 4px 0; font-size: 13px; }
+.link-edit-row span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-edit-row small { color: var(--gray-500); }
+.link-add { display: grid; grid-template-columns: 1fr 1.6fr auto; gap: 6px; margin-top: 8px; }
+.link-add .input { font-size: 12px; padding: 6px 8px; }
+.links-empty { font-size: 12px; color: var(--gray-500); padding: 6px 0; }
+.pj-wrap { max-width: 920px; margin: 0 auto; }
+.pj-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+#pj-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.pj-card { padding: 16px; display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.pj-top { display: flex; align-items: center; gap: 8px; }
+.pj-name { font-weight: 700; font-size: 15px; flex: 1; min-width: 0; }
+.pj-status { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--gray-100); color: var(--gray-600); white-space: nowrap; }
+.pj-status.active { background: #e3f1e8; color: #2f7a4f; }
+.pj-status.waiting { background: #fbf0dc; color: #96651b; }
+.pj-status.done { background: var(--gray-100); color: var(--gray-500); }
+.pj-sum { font-size: 13px; line-height: 1.7; color: var(--ink-soft); }
+.pj-next { font-size: 12.5px; line-height: 1.7; margin: 0; padding-left: 18px; }
+.pj-label { font-size: 11px; font-weight: 600; color: var(--gray-500); margin-bottom: 2px; }
+.pj-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 4px; font-size: 11px; color: var(--gray-500); }
+.pj-empty { padding: 32px 16px; text-align: center; color: var(--gray-500); font-size: 13px; line-height: 1.8; }
+.cal-cals { padding: 12px 16px 14px; border-bottom: 1px solid var(--gray-100); display: flex; flex-wrap: wrap; gap: 6px; }
+.cal-cals-title { width: 100%; font-size: 11px; font-weight: 600; color: var(--gray-500); }
+.cal-cal { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 10px 4px 8px; border-radius: 999px; border: 1px solid var(--gray-200, #e6e6e6); background: #fff; color: var(--ink); cursor: pointer; transition: all var(--ease); }
+.cal-cal i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex-shrink: 0; }
+.cal-cal.off { color: var(--gray-400); background: var(--gray-50); }
+.cal-cal.off i { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
+.cal-tasks { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; min-width: 0; }
+.cal-task { font-size: 10px; line-height: 13px; padding-left: 12px; position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink); text-align: left; }
+.cal-task::before { content: ''; position: absolute; left: 2px; top: 3px; width: 6px; height: 6px; border-radius: 50%; box-shadow: inset 0 0 0 1.2px var(--gray-500); }
+.cal-task.done { color: var(--gray-400); text-decoration: line-through; }
+.cal-task.done::before { background: var(--green-500); box-shadow: none; }
+/* タスクのドラッグ（マウス・指の両方） */
+.handle { touch-action: none; cursor: grab; }
+.drag-ghost { position: fixed; z-index: 400; pointer-events: none; padding: 6px 12px; border-radius: 8px; background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.18); font-size: 13px; font-weight: 500; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: translate(12px, -50%); }
+body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-select: none; }
+.cal-cell.drop-into, .tg-ad.drop-into, .tg-dh.drop-into { box-shadow: inset 0 0 0 2px var(--pri-500); }
+.tg-taskghost { position: absolute; left: 2px; right: 2px; border-radius: 6px; background: rgba(31,31,31,.12); border: 1.5px dashed var(--pri-500); font-size: 11px; padding: 2px 6px; pointer-events: none; z-index: 3; overflow: hidden; }
+.tg-resize { position: absolute; left: 0; right: 0; bottom: -2px; height: 10px; cursor: ns-resize; touch-action: none; z-index: 2; }
+.tg-resize::after { content: ''; position: absolute; left: 50%; bottom: 3px; width: 18px; height: 3px; margin-left: -9px; border-radius: 2px; background: currentColor; opacity: 0; transition: opacity var(--ease); }
+.tg-ev:hover .tg-resize::after, .tg-ev.resizing .tg-resize::after { opacity: .45; }
+@media (hover: none) { .tg-resize { height: 16px; bottom: -4px; } .tg-resize::after { opacity: .35; } }
+.tg-ev.resizing { z-index: 4; outline: 1.5px solid var(--pri-500); }
 .changelog { list-style: none; margin-top: 12px; display: grid; gap: 12px; }
 .changelog b { font-size: 13px; }
 .changelog small { color: var(--gray-600); margin-left: 6px; }
@@ -874,6 +922,7 @@ a.sale-title:hover { text-decoration: underline; }
         <button class="nav-btn" data-action="tab" data-tab="calendar" data-icon="calendar"><span>Calendar</span></button>
         <button class="nav-btn" data-action="tab" data-tab="sales" data-icon="sales"><span>Sales</span></button>
         <button class="nav-btn" data-action="tab" data-tab="minatoya" data-icon="store"><span>MINATOYA</span></button>
+        <button class="nav-btn" data-action="tab" data-tab="projects" data-icon="list"><span>Projects</span></button>
         <button class="nav-btn" data-action="tab" data-tab="settings" data-icon="settings"><span>Settings</span></button>
       </nav>
     </div>
@@ -889,16 +938,6 @@ a.sale-title:hover { text-decoration: underline; }
           <div class="hero-greet" id="hero-greet"></div>
           <h2 class="hero-date"><span id="hero-date"></span><span class="pill pill-today">今日</span></h2>
           <div class="weather" id="weather"></div>
-          <div class="hero-progress">
-            <div class="hero-stat">
-              <span class="hero-big" id="hero-done">0</span>
-              <span class="hero-total" id="hero-total">/ 0 件完了</span>
-              <span class="hero-sep">・</span>
-              <span class="hero-pct" id="hero-pct">0%</span>
-              <span class="hero-remain" id="hero-remain"></span>
-            </div>
-            <div class="progress" id="hero-bar"><i></i></div>
-          </div>
           <div class="hero-links"><div id="hero-notif"></div><div id="hero-sales"></div><div id="shiitake-link"></div></div>
         </div>
 
@@ -917,21 +956,10 @@ a.sale-title:hover { text-decoration: underline; }
         <div id="schedule-list"></div>
       </section>
 
-      <aside class="notes" aria-label="Notes">
-        <div class="notes-head">
-          <span class="notes-title">Notes</span>
-          <span class="notes-count" id="notes-count">0件</span>
-        </div>
-        <div class="composer">
-          <textarea id="note-input" placeholder="メモを追加..." rows="1" aria-label="メモを追加"></textarea>
-          <div class="composer-foot">
-            <select class="select" id="note-project" aria-label="プロジェクト"></select>
-            <span class="composer-hint">⌘ + Enter</span>
-            <button class="btn btn-primary btn-sm" data-action="note-post">投稿</button>
-          </div>
-        </div>
-        <div id="note-list"></div>
-      </aside>
+      <section class="card links" aria-label="リンク">
+        <div class="schedule-head"><span class="schedule-title">リンク</span><span class="schedule-count"></span><button class="btn btn-outline btn-xs" data-action="link-edit" id="link-edit-btn">編集</button></div>
+        <div id="link-list"></div>
+      </section>
       </div>
     </div>
   </section>
@@ -963,6 +991,16 @@ a.sale-title:hover { text-decoration: underline; }
         </div>
         <div class="cal-side" id="cal-detail"></div>
       </div>
+    </div>
+  </section>
+
+  <!-- Projects（Claude でピン留めしている nagi. のプロジェクト） -->
+  <section class="view" id="view-projects">
+    <div class="pj-wrap">
+      <div class="pj-head">
+        <div><div class="set-title">プロジェクトの進み具合</div><div class="set-desc" id="pj-updated">Claude でピン留めしている nagi. のプロジェクトです。</div></div>
+      </div>
+      <div id="pj-list"></div>
     </div>
   </section>
 
@@ -1178,6 +1216,14 @@ a.sale-title:hover { text-decoration: underline; }
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.7', date: '2026-11-03', items: [
+      'Notes をなくして、仕事で使うサイト（Slack など）へのリンクを追加',
+      'タスクの完了数・進み具合の表示をなくしてすっきり',
+      'タスクをドラッグしてカレンダーへ（日付に置くと日付変更、時間に置くとその時間に予定として入る）。スマホは ⠿ を押したまま動かす',
+      '予定の下の端をドラッグして長さを変えられるように',
+      'カレンダーの右側で、表示するカレンダーとタスクをタップで切り替え',
+      'Projects タブ：Claude でピン留めしている nagi. のプロジェクトの進み具合',
+    ] },
     { v: '1.6', date: '2026-11-03', items: [
       'PC のカレンダー：選んだ日のタスクと予定を、下ではなく右側に並べて表示',
     ] },
@@ -1229,6 +1275,7 @@ a.sale-title:hover { text-decoration: underline; }
     evTemplates: 'taskdock_evTemplates',
     salesGoal: 'taskdock_salesGoal',
     minatoya: 'taskdock_minatoya',
+    links: 'taskdock_links',
   };
   const DEFAULT_WORKTYPES = [
     { id: 'coding', label: 'コーディング', color: '#3b82f6' },
@@ -1546,7 +1593,7 @@ function cleanupLegacy_() {
   const ui = Object.assign({ collapsed: {} }, read(KEYS.ui, {}) || {});
   if (!ui.collapsed || typeof ui.collapsed !== 'object') ui.collapsed = {};
   if (!['day', '4day', 'month'].includes(ui.calView)) ui.calView = 'month';
-  const saveUI = () => write(KEYS.ui, { collapsed: ui.collapsed, calView: ui.calView });
+  const saveUI = () => write(KEYS.ui, { collapsed: ui.collapsed, calView: ui.calView, hideTasks: !!ui.hideTasks });
 
   // Google カレンダー連携の状態
   const G_DEFAULTS = { url: '', key: '', calendarId: null, account: '', lastSync: null, lastError: null, pendingDeletes: [], tzWarn: '', knownCals: [], hiddenCals: [] };
@@ -1695,19 +1742,10 @@ function cleanupLegacy_() {
   /* ================= Render: Tasks ================= */
   function renderHero() {
     const td = today();
-    const s = summarize(tasksOn(td));
     const hr = new Date().getHours();
     $('#hero-greet').textContent = hr < 4 ? 'こんばんは' : hr < 11 ? 'おはようございます' : hr < 18 ? 'こんにちは' : 'こんばんは';
     $('#hero-date').textContent = fmtDate(td);
-    $('#hero-done').textContent = s.done;
-    $('#hero-total').textContent = `/ ${s.count} 件完了`;
-    $('#hero-pct').textContent = `${s.pct}%`;
-    const remain = s.count - s.done;
-    $('#hero-remain').textContent = s.count === 0 ? '' : remain > 0 ? `残り ${remain} 件` : 'すべて完了';
-    const bar = $('#hero-bar');
-    bar.querySelector('i').style.width = `${s.pct}%`;
-    bar.classList.toggle('full', s.count > 0 && s.pct >= 100);
-    document.title = s.count ? `${s.done}/${s.count} — TASKDOCK` : 'TASKDOCK';
+    document.title = 'TASKDOCK';
     renderShiitake();
     renderSchedule();
     renderSalesChip();
@@ -1721,7 +1759,7 @@ function cleanupLegacy_() {
     const tags = (showDate && t.scheduledDate ? tagHTML(relLabel(t.scheduledDate) || fmtDate(t.scheduledDate), '#b5544d') : '')
       + (p ? tagHTML(p.name, p.color) : '') + (w ? tagHTML(w.label, w.color) : '');
     return `<div class="task${done ? ' done' : ''}${justAdded === t.id ? ' fade-in' : ''}" data-id="${t.id}">`
-      + `<span class="handle" draggable="true" title="ドラッグで並べ替え">${I.grip}</span>`
+      + `<span class="handle" data-drag-task="${t.id}" title="ドラッグで並べ替え・カレンダーへ">${I.grip}</span>`
       + `<button class="check" data-action="toggle" aria-label="${done ? '未完了に戻す' : '完了にする'}">${I.check}</button>`
       + `<div class="t-main">`
       + (editT
@@ -1744,8 +1782,7 @@ function cleanupLegacy_() {
     const collapsed = collapsible && ui.collapsed[key];
     const inner = `${collapsible ? `<span class="caret">${I.chevD}</span>` : ''}`
       + `<span>${label}</span>${sub ? `<span class="sec-date">${sub}</span>` : ''}`
-      + `<span class="sec-count">（${s.count}件）</span>`
-      + `<span class="sec-meta">${s.count ? `${s.done} <span class="muted">/ ${s.count} 完了</span>` : ''}</span>`;
+      + `<span class="sec-count">（${s.count}件）</span>`;
     return `<div class="card flush sec${collapsed ? ' collapsed' : ''}">`
       + (collapsible ? `<button class="sec-head" data-action="sec-toggle" data-sec="${key}" aria-expanded="${!collapsed}">${inner}</button>` : `<div class="sec-head">${inner}</div>`)
       + (dateKey !== 'someday' ? gListHTML(dateKey) : '')
@@ -1770,9 +1807,7 @@ function cleanupLegacy_() {
     }
 
     // Today
-    const s = summarize(todays);
-    html += `<div class="card flush sec"><div class="sec-head"><span>今日のタスク</span>`
-      + `<span class="sec-meta">${s.count ? `${s.done} <span class="muted">/ ${s.count} 完了</span>` : ''}</span></div>`;
+    html += `<div class="card flush sec"><div class="sec-head"><span>今日のタスク</span></div>`;
     if (todays.length) html += listHTML(todays, td, '');
     else html += `<div class="task-list" data-date="${td}"><div class="empty"><div class="empty-icon">${I.sun}</div>今日のタスクはまだありません<small>上の入力欄から、今日やることを追加しましょう</small></div></div>`;
     html += `</div>`;
@@ -1792,10 +1827,12 @@ function cleanupLegacy_() {
   }
   function renderNoteComposer() {
     const sel = $('#note-project');
+    if (!sel) return; // Notes は v1.7 でなくした
     const cur = sel.value;
     sel.innerHTML = projectOptions(projectOf(cur) ? cur : '');
   }
   function renderNotes() {
+    if (!$('#note-list')) return;
     const notes = [...db.notes].sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
     $('#notes-count').textContent = `${notes.length}件`;
     const box = $('#note-list');
@@ -1908,8 +1945,8 @@ function cleanupLegacy_() {
 
     const allday = days.map((d, i) => {
       const chips = evAll[i].filter(e => e.allDay).map(e => { const c = normColor(e.color); return `<span class="tg-chip" ${evAttrs(e)} style="background:${c}26;box-shadow:inset 3px 0 0 ${c}" title="${esc(e.title)}（${esc(e.cal)}）">${esc(e.title || '（タイトルなし）')}</span>`; }).join('');
-      const tasks = tasksOn(d).map(t => `<button class="tg-chip tg-task${t.status === 'completed' ? ' done' : ''}" data-id="${t.id}" data-action="toggle" title="${esc(t.title)}（クリックで完了/未完了）"><i></i><span>${esc(t.title)}</span></button>`).join('');
-      return `<div class="tg-ad">${chips}${tasks}</div>`;
+      const tasks = (ui.hideTasks ? [] : tasksOn(d)).map(t => `<button class="tg-chip tg-task${t.status === 'completed' ? ' done' : ''}" data-id="${t.id}" data-drag-task="${t.id}" data-action="toggle" title="${esc(t.title)}（クリックで完了/未完了・ドラッグで時間に入れる）"><i></i><span>${esc(t.title)}</span></button>`).join('');
+      return `<div class="tg-ad" data-date="${d}">${chips}${tasks}</div>`;
     }).join('');
 
     const cols = days.map((d, i) => {
@@ -1934,7 +1971,8 @@ function cleanupLegacy_() {
         const w = 100 / x.lanes;
         const past = new Date(x.e.end).getTime() <= now.getTime();
         return `<div class="tg-ev${h < 34 ? ' sm' : ''}${past ? ' past' : ''}" ${evAttrs(x.e)} style="top:${x.s * HPX + 1}px;height:${h}px;left:calc(${x.lane * w}% + 2px);width:calc(${w}% - 4px);background:${c}2e;box-shadow:inset 3px 0 0 ${c}" title="${esc(x.e.title)}（${esc(x.e.cal)}）">`
-          + `<b>${esc(x.e.title || '（タイトルなし）')}</b><span>${gTimeLabel(x.e, d)}</span></div>`;
+          + `<b>${esc(x.e.title || '（タイトルなし）')}</b><span>${gTimeLabel(x.e, d)}</span>`
+          + (x.e.mine && !x.e.rec ? `<i class="tg-resize" data-resize title="ドラッグで長さを変更"></i>` : '') + `</div>`;
       }).join('');
       const nowLine = d === td ? `<div class="tg-now" style="top:${nowH * HPX}px"></div>` : '';
       return `<div class="tg-col${d === td ? ' today' : ''}" data-date="${d}" title="クリックで予定を追加">${evs}${nowLine}</div>`;
@@ -1970,29 +2008,33 @@ function cleanupLegacy_() {
       if (key === td) cls.push('today');
       if (key === calSel) cls.push('sel');
       if (d.getDay() === 0) cls.push('sun');
-      const sorted = [...list].sort((a, b) => (b.status === 'completed') - (a.status === 'completed'));
-      const dots = sorted.slice(0, 8).map(t => `<i class="${t.status === 'completed' ? 'on' : ''}"></i>`).join('');
+      const tl = ui.hideTasks ? [] : [...list].sort((a, b) => (a.status === 'completed') - (b.status === 'completed'));
       const evs = gConnected() ? eventsOn(key) : [];
       const evHTML = evs.length
         ? `<span class="cal-evs">${evs.slice(0, 2).map(e => { const c = normColor(e.color); return `<span class="cal-ev" style="--c:${c};--cb:${c}24">${esc(e.title || '予定')}</span>`; }).join('')}`
           + `${evs.length > 2 ? `<span class="cal-ev-more">+${evs.length - 2}</span>` : ''}</span>`
         : '';
+      const tHTML = tl.length
+        ? `<span class="cal-tasks">${tl.slice(0, 2).map(t => `<span class="cal-task${t.status === 'completed' ? ' done' : ''}">${esc(t.title)}</span>`).join('')}${tl.length > 2 ? `<span class="cal-ev-more">+${tl.length - 2}</span>` : ''}</span>`
+        : '';
       html += `<button class="${cls.join(' ')}" data-action="cal-pick" data-date="${key}" aria-label="${d.getMonth() + 1}月${d.getDate()}日 タスク${s.count}件${evs.length ? ` 予定${evs.length}件` : ''}">`
-        + `<span class="cal-num">${d.getDate()}</span>${evHTML}`
-        + (s.count ? `<span class="cal-info"><span class="cal-count"><b>${s.done}</b>/${s.count}件</span><span class="cal-dots">${dots}</span></span>` : '')
+        + `<span class="cal-num">${d.getDate()}</span>${evHTML}${tHTML}`
         + `</button>`;
     }
     $('#cal-grid').innerHTML = html;
   }
   function renderCalDetail() {
     const list = tasksOn(calSel);
-    const s = summarize(list);
     const rel = relLabel(calSel);
+    // Google カレンダーのように、表示するカレンダーをタップで切り替え
+    const cals = gConnected() ? gcal.knownCals : [];
+    const calsHTML = `<div class="cal-cals"><div class="cal-cals-title">表示するカレンダー（タップで切り替え）</div>`
+      + `<button class="cal-cal${ui.hideTasks ? ' off' : ''}" data-action="cal-toggle-tasks" style="--c:var(--pri-500)"><i></i>タスク</button>`
+      + cals.map(c => `<button class="cal-cal${gcal.hiddenCals.includes(c.name) ? ' off' : ''}" data-action="cal-toggle-cal" data-cal="${esc(c.name)}" style="--c:${normColor(c.color) || 'var(--gray-400)'}"><i></i>${esc(c.name)}</button>`).join('')
+      + `</div>`;
     $('#cal-detail').innerHTML = `<div class="cal-detail"><div class="card flush">`
-      + `<div class="cal-detail-head"><div class="hero-top"><h3 class="hero-date">${fmtDate(calSel)}${rel ? `<span class="pill">${rel}</span>` : ''}</h3>`
-      + `<span class="muted" style="font-size:12px">完了 ${s.done}/${s.count} 件</span></div>`
-      + `<div class="hero-stat"><span class="hero-big" style="font-size:22px">${s.done}</span><span class="hero-total">/ ${s.count} 件完了</span><span class="hero-sep">・</span><span class="hero-pct">${s.pct}%</span></div>`
-      + `<div class="progress${s.count && s.pct >= 100 ? ' full' : ''}"><i style="width:${s.pct}%"></i></div></div>`
+      + calsHTML
+      + `<div class="cal-detail-head"><div class="hero-top"><h3 class="hero-date">${fmtDate(calSel)}${rel ? `<span class="pill">${rel}</span>` : ''}</h3></div></div>`
       + gListHTML(calSel)
       + `<div class="quick"><div class="quick-icon">${I.plus}</div><input id="cal-quick" class="js-quick" data-date="${calSel}" type="text" placeholder="${fmtDate(calSel)} にタスクを追加" autocomplete="off" enterkeyhint="done"><button class="btn btn-primary btn-sm" data-action="quick-add" data-target="cal-quick">追加</button></div>`
       + listHTML(list, calSel, 'この日のタスクはありません')
@@ -2014,7 +2056,7 @@ function cleanupLegacy_() {
       : `<div class="set-empty">プロジェクトはまだありません。下から追加しましょう。</div>`;
     const doneN = db.tasks.filter(t => t.status === 'completed').length;
     $('#stats').innerHTML = [
-      [db.tasks.length, 'タスク'], [db.projects.length, 'プロジェクト'], [db.notes.length, 'ノート'], [doneN, '完了したタスク'],
+      [db.tasks.length, 'タスク'], [db.projects.length, 'プロジェクト'], [sales.length, 'Sales'], [doneN, '完了したタスク'],
     ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
     renderGcalCard();
     renderWeatherSettings();
@@ -2333,6 +2375,85 @@ function cleanupLegacy_() {
       renderAll();
       toast('予定を削除しました');
     } catch (err) { $('#ev-msg').textContent = err.message; }
+  }
+
+  /* ================= リンク（仕事で使うサイト） ================= */
+  const DEFAULT_LINKS = [
+    { id: 'slack', name: 'Slack', url: 'https://app.slack.com/client' },
+    { id: 'gmail', name: 'Gmail', url: 'https://mail.google.com/' },
+    { id: 'gcal', name: 'Google カレンダー', url: 'https://calendar.google.com/' },
+    { id: 'drive', name: 'Google ドライブ', url: 'https://drive.google.com/' },
+    { id: 'claude', name: 'Claude', url: 'https://claude.ai/' },
+  ];
+  let links = read(KEYS.links, null);
+  if (!Array.isArray(links)) links = DEFAULT_LINKS.map(l => ({ ...l }));
+  const saveLinks = () => write(KEYS.links, links);
+  let linkEditing = false;
+  const safeUrl = u => /^(https?:|slack:|notion:|figma:|claude:|mailto:)/i.test(u) ? u : '';
+  function renderLinks() {
+    const box = $('#link-list');
+    if (!box) return;
+    $('#link-edit-btn').textContent = linkEditing ? '完了' : '編集';
+    if (linkEditing) {
+      box.innerHTML = links.map(l => `<div class="link-edit-row"><span>${esc(l.name)} <small>${esc(l.url)}</small></span><button class="icon-btn danger" data-action="link-del" data-lid="${l.id}" aria-label="${esc(l.name)}を削除">${I.trash}</button></div>`).join('')
+        + `<div class="link-add"><input class="input" id="link-name" placeholder="名前（例：Slack）" autocomplete="off"><input class="input" id="link-url" placeholder="URL（https://… や slack://open）" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="btn btn-primary btn-sm" data-action="link-add">追加</button></div>`;
+      return;
+    }
+    box.innerHTML = links.length
+      ? `<div class="link-grid">${links.map(l => `<a class="link-item" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" title="${esc(l.url)}"><b class="link-mark">${esc((l.name || '?').slice(0, 1))}</b><span>${esc(l.name)}</span></a>`).join('')}</div>`
+      : `<div class="links-empty">「編集」からよく使うサイトを追加できます</div>`;
+  }
+  function addLink() {
+    const name = $('#link-name').value.trim();
+    let url = $('#link-url').value.trim();
+    if (url && !/^[a-z][a-z0-9+.-]*:/i.test(url)) url = 'https://' + url;
+    if (!name || !safeUrl(url)) { toast('名前と URL（https://… など）を入れてください'); return; }
+    links.push({ id: uid(), name, url });
+    saveLinks(); renderLinks();
+    $('#link-name').focus();
+  }
+
+  /* ================= Projects（Claude でピン留めしている nagi. のプロジェクト） ================= */
+  // Claude の定期タスクが projects.js（Mac の中だけ）に書き込んだ内容を表示する
+  const PJ_STATUS = { active: '進行中', waiting: '待ち', paused: '一時停止', done: '完了' };
+  function projectsData() { const d = window.TASKDOCK_PROJECTS; return d && Array.isArray(d.items) ? d : null; }
+  function setProjectsNav() {
+    const btn = document.querySelector('.nav-btn[data-tab="projects"]');
+    if (btn) btn.hidden = !LOCAL_ONLY && !projectsData();
+  }
+  function loadProjects() {
+    if (!LOCAL_ONLY) return;
+    const old = document.getElementById('projects-src');
+    if (old) old.remove();
+    const sc = document.createElement('script');
+    sc.id = 'projects-src';
+    sc.src = `projects.js?t=${Date.now()}`;
+    sc.onload = () => { setProjectsNav(); if (tab === 'projects') renderProjects(); };
+    sc.onerror = () => {};
+    document.head.appendChild(sc);
+  }
+  function renderProjects() {
+    const d = projectsData();
+    const list = $('#pj-list');
+    if (!d || !d.items.length) {
+      $('#pj-updated').textContent = 'Claude でピン留めしている nagi. のプロジェクトです。';
+      list.innerHTML = `<div class="card pj-empty">まだ進み具合の情報がありません。<br>Claude の定期タスク「プロジェクト進捗の更新」が動くと、ここに並びます。</div>`;
+      return;
+    }
+    $('#pj-updated').textContent = `Claude でピン留めしている nagi. のプロジェクト ・ ${fmtUpdated(d.updatedAt)}に更新`;
+    list.innerHTML = d.items.map(x => {
+      const pct = Math.max(0, Math.min(100, Math.round(+x.progress || 0)));
+      const st = PJ_STATUS[x.status] ? x.status : 'active';
+      const next = Array.isArray(x.next) ? x.next.filter(Boolean).slice(0, 4) : [];
+      return `<div class="card pj-card">`
+        + `<div class="pj-top"><span class="pj-name">${esc(x.title || '')}</span><span class="pj-status ${st}">${esc(x.statusLabel || PJ_STATUS[st])}</span></div>`
+        + (x.progress != null ? `<div class="progress${pct >= 100 ? ' full' : ''}" title="${pct}%"><i style="width:${pct}%"></i></div>` : '')
+        + (x.summary ? `<div class="pj-sum">${esc(x.summary)}</div>` : '')
+        + (next.length ? `<div><div class="pj-label">次にやること</div><ul class="pj-next">${next.map(n => `<li>${esc(n)}</li>`).join('')}</ul></div>` : '')
+        + `<div class="pj-foot"><span>${x.lastActivityAt ? `最終作業：${fmtUpdated(x.lastActivityAt)}` : ''}</span>`
+        + (x.link && /^claude:/.test(x.link) ? `<a class="btn btn-outline btn-xs" href="${esc(x.link)}">Claude で開く</a>` : '')
+        + `</div></div>`;
+    }).join('');
   }
 
   /* ================= Sales（営業・応募の管理） ================= */
@@ -3402,6 +3523,8 @@ function cleanupLegacy_() {
     if (tab === 'settings') renderSettings();
     if (tab === 'sales') renderSales();
     if (tab === 'minatoya') renderMinatoya();
+    if (tab === 'projects') renderProjects();
+    renderLinks();
     if (menuEl) refreshMenu();
     justAdded = null;
     const inp = document.querySelector('.view.active [data-edit]');
@@ -3655,6 +3778,19 @@ function cleanupLegacy_() {
       case 'g-copy': copyScript(); break;
       case 'g-connect': gConnect(); break;
       case 'g-code-copy': copyConnectCode(); break;
+      case 'cal-toggle-tasks': ui.hideTasks = !ui.hideTasks; saveUI(); renderCalendar(); break;
+      case 'cal-toggle-cal': {
+        const name = el.dataset.cal;
+        const off = gcal.hiddenCals.includes(name);
+        gcal.hiddenCals = gcal.hiddenCals.filter(n => n !== name);
+        if (!off) gcal.hiddenCals.push(name);
+        saveG(); renderAll();
+        if (off) scheduleGSync(200); // 隠していたカレンダーは取り直す
+        break;
+      }
+      case 'link-edit': linkEditing = !linkEditing; renderLinks(); break;
+      case 'link-del': links = links.filter(l => l.id !== el.dataset.lid); saveLinks(); renderLinks(); break;
+      case 'link-add': addLink(); break;
       case 'data-export': exportData(); break;
       case 'data-import': $('#import-file').value = ''; $('#import-file').click(); break;
       case 'show-changelog': switchTab('settings'); requestAnimationFrame(() => window.scrollTo(0, $('#changelog-card').getBoundingClientRect().top + window.scrollY - 72)); break;
@@ -3755,6 +3891,7 @@ function cleanupLegacy_() {
     if (is('.js-quick') && e.key === 'Enter' && !composing) { e.preventDefault(); quickAdd(t); return; }
     if (is('#note-input') && e.key === 'Enter' && (e.metaKey || e.ctrlKey) && !composing) { e.preventDefault(); postNote(); return; }
     if (is('#wt-name') && e.key === 'Enter' && !composing) { e.preventDefault(); addWorkType(); return; }
+    if ((is('#link-name') || is('#link-url')) && e.key === 'Enter' && !composing) { e.preventDefault(); addLink(); return; }
     if (is('#pj-name') && e.key === 'Enter' && !composing) { e.preventDefault(); addProject(); return; }
     if (is('#g-url') && e.key === 'Enter' && !composing) { e.preventDefault(); gConnect(); return; }
     if (is('#wx-query') && e.key === 'Enter' && !composing) { e.preventDefault(); searchPlace(); return; }
@@ -3805,6 +3942,7 @@ function cleanupLegacy_() {
       if (!t.checked) gcal.hiddenCals.push(name);
       saveG();
       renderAll();
+      if (t.checked) scheduleGSync(200);
     } else if (t.matches('[data-note-project]')) {
       const n = db.notes.find(x => x.id === t.dataset.noteProject);
       if (n) { n.projectId = t.value || null; n.updatedAt = new Date().toISOString(); persist('notes'); }
@@ -3839,64 +3977,175 @@ function cleanupLegacy_() {
   window.addEventListener('scroll', () => closeMenu(), { passive: true });
   window.addEventListener('resize', () => closeMenu());
 
-  /* ================= Drag & drop ================= */
+  /* ================= Drag & drop（マウス・指の両方） ================= */
+  // ⠿ をつかんで：一覧の中で並べ替え／ほかの日の一覧へ移動／カレンダーの日付へ（日付変更）／時間の枠へ（その時間に予定を作る）
   function clearDropMarks() {
     document.querySelectorAll('.drop-before, .drop-after, .drop-into').forEach(el => el.classList.remove('drop-before', 'drop-after', 'drop-into'));
+    document.querySelectorAll('.tg-taskghost').forEach(el => el.remove());
   }
-  document.addEventListener('dragstart', e => {
-    const h = e.target.closest && e.target.closest('.handle');
+  let pd = null, suppressClick = false;
+  const qTime = q => `${pad(Math.floor(q / 4))}:${pad((q % 4) * 15)}`;
+  document.addEventListener('click', e => {
+    if (!suppressClick) return;
+    suppressClick = false;
+    e.stopPropagation(); e.preventDefault();
+  }, true);
+  const swallowNextClick = () => { suppressClick = true; setTimeout(() => { suppressClick = false; }, 350); };
+
+  document.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    const h = e.target.closest && e.target.closest('[data-drag-task]');
     if (!h) return;
-    const row = h.closest('.task');
-    dragId = row.dataset.id;
-    closeMenu();
-    e.dataTransfer.effectAllowed = 'move';
-    try { e.dataTransfer.setData('text/plain', dragId); } catch (err) {}
-    try { e.dataTransfer.setDragImage(row, 24, row.offsetHeight / 2); } catch (err) {}
-    requestAnimationFrame(() => row.classList.add('dragging'));
+    if (h.classList.contains('handle')) e.preventDefault();
+    pd = { id: h.dataset.dragTask, x0: e.clientX, y0: e.clientY, started: false, target: null, pointerId: e.pointerId };
   });
-  document.addEventListener('dragover', e => {
-    if (!dragId || !e.target.closest) return;
-    const list = e.target.closest('.task-list');
-    if (!list || list.dataset.date === 'overdue') return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    clearDropMarks();
-    const row = e.target.closest('.task');
-    if (row && row.dataset.id !== dragId) {
-      const r = row.getBoundingClientRect();
-      row.classList.add(e.clientY < r.top + r.height / 2 ? 'drop-before' : 'drop-after');
-    } else if (!row) {
-      list.classList.add('drop-into');
+  document.addEventListener('pointermove', e => {
+    if (!pd) return;
+    if (!pd.started) {
+      if (Math.hypot(e.clientX - pd.x0, e.clientY - pd.y0) < 6) return;
+      const t = findTask(pd.id);
+      if (!t) { pd = null; return; }
+      pd.started = true;
+      closeMenu();
+      pd.ghost = document.createElement('div');
+      pd.ghost.className = 'drag-ghost';
+      pd.ghost.textContent = t.title;
+      document.body.appendChild(pd.ghost);
+      document.body.classList.add('task-dragging');
+      const row = document.querySelector(`.task[data-id="${pd.id}"]`);
+      if (row) row.classList.add('dragging');
     }
-  });
-  document.addEventListener('drop', e => {
-    if (!dragId || !e.target.closest) return;
-    const list = e.target.closest('.task-list');
-    if (!list || list.dataset.date === 'overdue') return;
     e.preventDefault();
-    const date = list.dataset.date === 'someday' ? null : list.dataset.date;
-    let beforeId = null;
-    const before = list.querySelector('.task.drop-before');
-    const after = list.querySelector('.task.drop-after');
-    if (before) beforeId = before.dataset.id;
-    else if (after) {
-      let next = after.nextElementSibling;
-      while (next && next.dataset.id === dragId) next = next.nextElementSibling;
-      beforeId = next && next.classList.contains('task') ? next.dataset.id : null;
-    } else {
-      const row = e.target.closest('.task');
-      if (row) return; // dropped on itself
+    pd.ghost.style.left = `${e.clientX}px`;
+    pd.ghost.style.top = `${e.clientY}px`;
+    // 画面の端に来たら少しスクロール
+    if (e.clientY < 70) window.scrollBy(0, -14); else if (e.clientY > window.innerHeight - 70) window.scrollBy(0, 14);
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    clearDropMarks();
+    pd.target = null;
+    if (!el) return;
+    const col = el.closest('.tg-col');
+    if (col) {
+      const body = col.closest('.tg-body');
+      if (body) { const r = body.getBoundingClientRect(); if (e.clientY > r.bottom - 24) body.scrollTop += 12; else if (e.clientY < r.top + 24) body.scrollTop -= 12; }
+      const q = Math.max(0, Math.min(92, Math.floor((e.clientY - col.getBoundingClientRect().top) / TG_Q)));
+      const g = document.createElement('div');
+      g.className = 'tg-taskghost';
+      g.style.top = `${q * TG_Q}px`; g.style.height = `${4 * TG_Q - 2}px`;
+      g.textContent = `${qTime(q)} – ${qTime(q + 4)}`;
+      col.appendChild(g);
+      pd.target = { kind: 'time', date: col.dataset.date, q };
+      return;
     }
-    const id = dragId;
-    dragId = null;
-    clearDropMarks();
-    moveTask(id, date, beforeId);
-    renderAll();
-  });
-  document.addEventListener('dragend', () => {
-    dragId = null;
-    clearDropMarks();
+    const cell = el.closest('.cal-cell, .tg-ad, .tg-dh');
+    if (cell && cell.dataset.date) { cell.classList.add('drop-into'); pd.target = { kind: 'date', date: cell.dataset.date }; return; }
+    const list = el.closest('.task-list');
+    if (list && list.dataset.date !== 'overdue') {
+      const row = el.closest('.task');
+      if (row && row.dataset.id !== pd.id) {
+        const r = row.getBoundingClientRect();
+        const before = e.clientY < r.top + r.height / 2;
+        row.classList.add(before ? 'drop-before' : 'drop-after');
+        let beforeId = row.dataset.id;
+        if (!before) { let n = row.nextElementSibling; while (n && n.dataset.id === pd.id) n = n.nextElementSibling; beforeId = n && n.classList.contains('task') ? n.dataset.id : null; }
+        pd.target = { kind: 'list', list: list.dataset.date, beforeId };
+      } else if (!row) {
+        list.classList.add('drop-into');
+        pd.target = { kind: 'list', list: list.dataset.date, beforeId: null };
+      }
+    }
+  }, { passive: false });
+  function endTaskDrag() {
+    if (pd && pd.ghost) pd.ghost.remove();
+    document.body.classList.remove('task-dragging');
     document.querySelectorAll('.task.dragging').forEach(r => r.classList.remove('dragging'));
+    clearDropMarks();
+    pd = null;
+  }
+  document.addEventListener('pointercancel', () => { if (pd) endTaskDrag(); });
+  document.addEventListener('pointerup', () => {
+    if (!pd) return;
+    const d = pd;
+    if (!d.started) { pd = null; return; }
+    swallowNextClick();
+    endTaskDrag();
+    const tg = d.target;
+    if (!tg) return;
+    const t = findTask(d.id);
+    if (!t) return;
+    if (tg.kind === 'list') {
+      moveTask(d.id, tg.list === 'someday' ? null : tg.list, tg.beforeId);
+      renderAll();
+    } else if (tg.kind === 'date') {
+      if (t.scheduledDate !== tg.date) { moveTask(d.id, tg.date, null); renderAll(); toast(`「${t.title}」を ${fmtDate(tg.date)} に移しました`); }
+    } else if (tg.kind === 'time') {
+      scheduleTaskAt(t, tg.date, tg.q);
+    }
+  });
+  // タスクを時間の枠に置いたら、その時間に Google カレンダーの予定（1時間）を作り、タスクもその日に移す
+  async function scheduleTaskAt(t, date, q) {
+    if (t.scheduledDate !== date) moveTask(t.id, date, null);
+    renderAll();
+    if (!gConnected()) { toast('タスクを移しました（時間に入れるには Google カレンダー連携が必要です）'); return; }
+    const payload = { title: t.title, allDay: false, date, start: `${date}T${qTime(q)}`, end: `${date}T${qTime(Math.min(95, q + 4))}`, loc: '', desc: 'TASKDOCK のタスクから作成', type: '', colorId: '' };
+    try {
+      const res = await gCall('createEvent', { event: payload });
+      gEvents.push(normalizeGEvent(res.event));
+      saveGEvents();
+      renderAll();
+      toast(`「${t.title}」を ${qTime(q)} からの予定に入れました（下の端をドラッグで長さを変更）`);
+    } catch (err) { toast(err.message); }
+  }
+
+  // 予定の下の端をドラッグして長さを変える（自分の予定・繰り返しでないもの）
+  let rz = null;
+  document.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    const hd = e.target.closest && e.target.closest('[data-resize]');
+    if (!hd) return;
+    e.preventDefault(); e.stopPropagation();
+    const evEl = hd.closest('.tg-ev'), col = hd.closest('.tg-col');
+    const ev = gEvents.find(x => x.id === evEl.dataset.evId && x.start === evEl.dataset.evStart);
+    if (!ev || !col) return;
+    const date = col.dataset.date;
+    const st = new Date(ev.start), en = new Date(ev.end);
+    if (ymd(st) !== date || ymd(new Date(en.getTime() - 1)) !== date) { toast('日をまたぐ予定は Google カレンダーで変更してください'); return; }
+    const sQ = Math.round((st.getHours() * 60 + st.getMinutes()) / 15);
+    const eQ = Math.round((en.getHours() * 60 + en.getMinutes()) / 15) || 96;
+    evEl.classList.add('resizing');
+    rz = { evEl, col, ev, date, sQ, eQ0: eQ, eQ, label: evEl.querySelector('span') };
+  }, true);
+  document.addEventListener('pointermove', e => {
+    if (!rz) return;
+    e.preventDefault();
+    const q = Math.round((e.clientY - rz.col.getBoundingClientRect().top) / TG_Q);
+    rz.eQ = Math.max(rz.sQ + 1, Math.min(95, q));
+    rz.evEl.style.height = `${Math.max(18, (rz.eQ - rz.sQ) * TG_Q - 2)}px`;
+    if (rz.label) rz.label.textContent = `${qTime(rz.sQ)}–${qTime(rz.eQ)}`;
+  }, { passive: false });
+  document.addEventListener('pointerup', async () => {
+    if (!rz) return;
+    const r = rz; rz = null;
+    swallowNextClick();
+    r.evEl.classList.remove('resizing');
+    if (r.eQ === r.eQ0) return;
+    const e = r.ev;
+    const ty = evTypeOf(e.type);
+    const payload = { id: e.id, title: e.title, allDay: false, date: r.date, start: `${r.date}T${qTime(r.sQ)}`, end: `${r.date}T${qTime(r.eQ)}`, loc: e.loc || '', desc: e.desc || '', type: e.type || '', colorId: ty ? ty.colorId : '' };
+    const before = { ...e };
+    e.end = new Date(`${r.date}T${qTime(r.eQ)}:00`).toISOString();
+    renderAll();
+    try {
+      const res = await gCall('updateEvent', { event: payload });
+      gEvents = gEvents.filter(x => !(x.id === before.id && x.start === before.start)).concat(normalizeGEvent(res.event));
+      saveGEvents();
+      renderAll();
+      toast(`「${e.title}」を ${qTime(r.sQ)}–${qTime(r.eQ)} に変更しました`);
+    } catch (err) {
+      Object.assign(e, before);
+      renderAll();
+      toast(err.message);
+    }
   });
 
   /* ================= Init ================= */
@@ -3935,6 +4184,9 @@ function cleanupLegacy_() {
   refreshWeather();
 
   setMinaNav();
+  setProjectsNav();
+  loadProjects();
+  setInterval(loadProjects, 5 * 60 * 1000);
 
   // バージョンと更新履歴
   $('#brand-ver').textContent = `v${APP_VERSION}`;
