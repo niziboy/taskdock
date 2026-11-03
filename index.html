@@ -436,6 +436,14 @@ button.sec-head:hover { background: var(--gray-50); }
 .cal-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--gray-300); flex-shrink: 0; }
 .cal-dots i.on { background: var(--green-500); }
 .cal-detail { margin-top: 16px; animation: fadeIn .2s ease; }
+/* PC：選んだ日のタスクをカレンダーの右に並べる */
+@media (min-width: 1024px) {
+  main:has(#view-calendar.active) { max-width: 1440px; }
+  .cal-wrap, .cal-wrap.wide { max-width: none; }
+  .cal-body { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+  .cal-side { position: sticky; top: 72px; max-height: calc(100vh - 90px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--gray-300) transparent; }
+  .cal-side .cal-detail { margin-top: 0; }
+}
 .cal-detail .card { margin-bottom: 0; }
 .cal-detail-head { padding: 16px 16px 12px; border-bottom: 1px solid var(--gray-100); }
 .cal-detail .quick { border: none; box-shadow: none; border-radius: 0; margin: 0; border-bottom: 1px solid var(--gray-100); padding: 8px 8px 8px 14px; }
@@ -947,10 +955,14 @@ a.sale-title:hover { text-decoration: underline; }
         </div>
         </div>
       </div>
-      <div class="cal-dows" id="cal-dows"></div>
-      <div class="cal-grid" id="cal-grid"></div>
-      <div id="cal-tg"></div>
-      <div id="cal-detail"></div>
+      <div class="cal-body">
+        <div class="cal-main">
+          <div class="cal-dows" id="cal-dows"></div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div id="cal-tg"></div>
+        </div>
+        <div class="cal-side" id="cal-detail"></div>
+      </div>
     </div>
   </section>
 
@@ -1166,6 +1178,9 @@ a.sale-title:hover { text-decoration: underline; }
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.6', date: '2026-11-03', items: [
+      'PC のカレンダー：選んだ日のタスクと予定を、下ではなく右側に並べて表示',
+    ] },
     { v: '1.5', date: '2026-11-03', items: [
       '携帯：ダブルタップや入力欄のタップで画面が拡大されないように',
     ] },
