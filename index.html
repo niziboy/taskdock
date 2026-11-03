@@ -1167,6 +1167,7 @@ a.sale-title:hover { text-decoration: underline; }
     { v: '1.4', date: '2026-11-03', items: [
       '接続コードの貼り付けを読み取りやすく（改行・空白が混ざっても、URL の欄に貼っても接続できる）',
       '接続できなかったときに理由を表示',
+      'iPhone で接続コードの先頭が小文字になっても接続できるように',
     ] },
     { v: '1.3', date: '2026-11-02', items: [
       'Mac・携帯でアプリとして開けるように（専用ウィンドウ・Dock／ホーム画面のアイコン）',
@@ -3100,7 +3101,7 @@ function cleanupLegacy_() {
     const input = $('#g-url'), msg = $('#g-setup-msg');
     const btn = document.querySelector('[data-action="g-connect"]');
     const url = input.value.trim();
-    if (url.includes(CODE_PREFIX)) { $('#g-conn-code').value = url; input.value = ''; gConnectByCode(); return; }
+    if (url.toUpperCase().includes(CODE_PREFIX)) { $('#g-conn-code').value = url; input.value = ''; gConnectByCode(); return; }
     if (!/^https:\/\/script\.google\.com\/(a\/macros\/[^/]+|macros)\/s\/[\w-]+\/exec\/?$/.test(url)) {
       msg.className = 'g-msg error';
       msg.textContent = '「https://script.google.com/macros/s/…/exec」の形の URL を貼り付けてください。';
@@ -3172,7 +3173,7 @@ function cleanupLegacy_() {
     try {
       // 改行・空白・全角コロンが混ざっても読めるように整える
       const raw = input.value.replace(/[\s\u200b]+/g, '').replace('：', ':');
-      const at = raw.indexOf(CODE_PREFIX);
+      const at = raw.toUpperCase().indexOf(CODE_PREFIX); // iPhone は URL とみなして先頭を小文字にすることがある
       if (at < 0) throw 0;
       const b64 = raw.slice(at + CODE_PREFIX.length).replace(/[^A-Za-z0-9+/=]/g, '');
       info = JSON.parse(decodeURIComponent(escape(atob(b64))));
