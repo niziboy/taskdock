@@ -45,7 +45,9 @@
   --ease: .15s ease;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation; } /* ダブルタップで拡大しない（2本指の拡大はできる） */
+/* iPhone は 16px 未満の入力欄をタップすると勝手に拡大するので、タッチ端末では 16px にする */
+@media (hover: none) and (pointer: coarse) { input, select, textarea { font-size: 16px !important; } }
 body {
   background: var(--bg);
   color: var(--ink);
@@ -1164,6 +1166,9 @@ a.sale-title:hover { text-decoration: underline; }
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.5', date: '2026-11-03', items: [
+      '携帯：ダブルタップや入力欄のタップで画面が拡大されないように',
+    ] },
     { v: '1.4', date: '2026-11-03', items: [
       '接続コードの貼り付けを読み取りやすく（改行・空白が混ざっても、URL の欄に貼っても接続できる）',
       '接続できなかったときに理由を表示',
