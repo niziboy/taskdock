@@ -1230,6 +1230,9 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.11', date: '2026-11-04', items: [
+      '自分の予定を黒のべた塗りに（SOIL は緑のまま。種類の色は Google カレンダーにだけ反映）',
+    ] },
     { v: '1.10', date: '2026-11-04', items: [
       'SOIL と自分のカレンダーを色分け：SOIL は緑のべた塗り、自分の予定は種類の色を薄く塗る形で区別',
       'カレンダーの色を Settings で変更できるように',
@@ -1655,16 +1658,15 @@ function cleanupLegacy_() {
     const set = (gcal.calColors || {})[name];
     if (isHex(set)) return set;
     if (isSoilCal(name)) return '#0b8043';
-    if (name === mainCal()) return '#3f51b5';
+    if (name === mainCal()) return '#1f1f1f';
     const g = (gcal.knownCals.find(c => c.name === name) || {}).color;
     return isHex(g) && !isGrayish(g) ? g : '#00897b';
   }
   const isOwnEv = e => !!e.mine || e.cal === mainCal();
-  // 自分の予定：種類の色を薄く塗る／ほかのカレンダー（SOIL など）：カレンダーの色でべた塗り
+  // 予定はカレンダーの色でべた塗り（自分は黒、SOIL は緑）。種類の色は Google 側にだけ反映する
   function evPaint(e) {
-    const own = isOwnEv(e);
-    const c = own && e.evColor && GCOLORS[e.evColor] ? GCOLORS[e.evColor].hex : calColor(e.cal);
-    return { c, own, style: own ? `background:${c}2e;box-shadow:inset 3px 0 0 ${c}` : `background:${c};color:${inkOn(c)}` };
+    const c = calColor(e.cal);
+    return { c, own: isOwnEv(e), style: `background:${c};color:${inkOn(c)}` };
   }
   const findTask = id => db.tasks.find(t => t.id === id);
   const projectOf = id => (id ? db.projects.find(p => p.id === id) : null);
@@ -2058,7 +2060,7 @@ function cleanupLegacy_() {
       const tl = ui.hideTasks ? [] : [...list].sort((a, b) => (a.status === 'completed') - (b.status === 'completed'));
       const evs = gConnected() ? eventsOn(key) : [];
       const evHTML = evs.length
-        ? `<span class="cal-evs">${evs.slice(0, 2).map(e => { const pt = evPaint(e); return `<span class="cal-ev" style="${pt.own ? `--c:${pt.c};--cb:${pt.c}24` : pt.style + ';box-shadow:none'}">${esc(e.title || '予定')}</span>`; }).join('')}`
+        ? `<span class="cal-evs">${evs.slice(0, 2).map(e => { const pt = evPaint(e); return `<span class="cal-ev" style="${pt.style};box-shadow:none">${esc(e.title || '予定')}</span>`; }).join('')}`
           + `${evs.length > 2 ? `<span class="cal-ev-more">+${evs.length - 2}</span>` : ''}</span>`
         : '';
       const tHTML = tl.length
