@@ -1230,6 +1230,9 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.12', date: '2026-11-04', items: [
+      '自分の予定の色を、黒からやわらかいグレーに',
+    ] },
     { v: '1.11', date: '2026-11-04', items: [
       '自分の予定を黒のべた塗りに（SOIL は緑のまま。種類の色は Google カレンダーにだけ反映）',
     ] },
@@ -1658,7 +1661,7 @@ function cleanupLegacy_() {
     const set = (gcal.calColors || {})[name];
     if (isHex(set)) return set;
     if (isSoilCal(name)) return '#0b8043';
-    if (name === mainCal()) return '#1f1f1f';
+    if (name === mainCal()) return '#5f6368';
     const g = (gcal.knownCals.find(c => c.name === name) || {}).color;
     return isHex(g) && !isGrayish(g) ? g : '#00897b';
   }
