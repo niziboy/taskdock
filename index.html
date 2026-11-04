@@ -1230,6 +1230,9 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.13', date: '2026-11-04', items: [
+      '種類（ご飯・仕事など）を付けた予定は、その色で表示。種類なしの予定はグレー、SOIL は緑',
+    ] },
     { v: '1.12', date: '2026-11-04', items: [
       '自分の予定の色を、黒からやわらかいグレーに',
     ] },
@@ -1666,10 +1669,13 @@ function cleanupLegacy_() {
     return isHex(g) && !isGrayish(g) ? g : '#00897b';
   }
   const isOwnEv = e => !!e.mine || e.cal === mainCal();
-  // 予定はカレンダーの色でべた塗り（自分は黒、SOIL は緑）。種類の色は Google 側にだけ反映する
+  // 予定はべた塗り：自分の予定は種類（ご飯など）の色、種類なしはグレー。SOIL などほかのカレンダーはカレンダーの色
   function evPaint(e) {
-    const c = calColor(e.cal);
-    return { c, own: isOwnEv(e), style: `background:${c};color:${inkOn(c)}` };
+    const own = isOwnEv(e);
+    const ty = own ? evTypeOf(e.type) : null;
+    const cat = own ? (GCOLORS[e.evColor] || (ty && GCOLORS[ty.colorId])) : null;
+    const c = cat ? cat.hex : calColor(e.cal);
+    return { c, own, style: `background:${c};color:${inkOn(c)}` };
   }
   const findTask = id => db.tasks.find(t => t.id === id);
   const projectOf = id => (id ? db.projects.find(p => p.id === id) : null);
