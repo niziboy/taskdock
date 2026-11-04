@@ -792,6 +792,9 @@ a.sale-title:hover { text-decoration: underline; }
 .app-item:active .app-icon { transform: scale(.94); }
 .app-name { font-size: 11px; line-height: 1.3; max-width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cal-cal.loading { opacity: .7; }
+.cal-cal-note { font-size: 10px; color: var(--gray-500); }
+.g-cal-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.g-cal-dinner { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); cursor: pointer; }
 .cal-cal.loading::after { content: '読み込み中…'; font-size: 10px; color: var(--gray-500); }
 .links .link-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px 0 2px; }
 .link-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--gray-100); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--ink); text-decoration: none; min-width: 0; transition: background var(--ease); }
@@ -1227,6 +1230,9 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.9', date: '2026-11-04', items: [
+      'カレンダーごとに「ディナーの時間だけ（16時〜）」表示を選べるように（SOIL のカレンダー向け）',
+    ] },
     { v: '1.8', date: '2026-11-04', items: [
       'リンクをアプリのアイコン風に（サイトのロゴ付き）',
       '隠していたカレンダー（soil など）を表示に戻したとき、すぐに予定が出るように',
@@ -1611,9 +1617,9 @@ function cleanupLegacy_() {
   const saveUI = () => write(KEYS.ui, { collapsed: ui.collapsed, calView: ui.calView, hideTasks: !!ui.hideTasks });
 
   // Google カレンダー連携の状態
-  const G_DEFAULTS = { url: '', key: '', calendarId: null, account: '', lastSync: null, lastError: null, pendingDeletes: [], tzWarn: '', knownCals: [], hiddenCals: [] };
+  const G_DEFAULTS = { url: '', key: '', calendarId: null, account: '', lastSync: null, lastError: null, pendingDeletes: [], tzWarn: '', knownCals: [], hiddenCals: [], dinnerOnly: [] };
   const gcal = Object.assign({ ...G_DEFAULTS }, read(KEYS.gcal, {}) || {});
-  ['pendingDeletes', 'knownCals', 'hiddenCals'].forEach(k => { if (!Array.isArray(gcal[k])) gcal[k] = []; });
+  ['pendingDeletes', 'knownCals', 'hiddenCals', 'dinnerOnly'].forEach(k => { if (!Array.isArray(gcal[k])) gcal[k] = []; });
   let gEvents = read(KEYS.gcalEvents, []);
   if (!Array.isArray(gEvents)) gEvents = [];
   const saveG = () => write(KEYS.gcal, gcal);
@@ -2045,7 +2051,7 @@ function cleanupLegacy_() {
     const cals = gConnected() ? gcal.knownCals : [];
     const calsHTML = `<div class="cal-cals"><div class="cal-cals-title">表示するカレンダー（タップで切り替え）</div>`
       + `<button class="cal-cal${ui.hideTasks ? ' off' : ''}" data-action="cal-toggle-tasks" style="--c:var(--pri-500)"><i></i>タスク</button>`
-      + cals.map(c => `<button class="cal-cal${gcal.hiddenCals.includes(c.name) ? ' off' : ''}${calLoading.has(c.name) ? ' loading' : ''}" data-action="cal-toggle-cal" data-cal="${esc(c.name)}" style="--c:${normColor(c.color) || 'var(--gray-400)'}"><i></i>${esc(c.name)}</button>`).join('')
+      + cals.map(c => `<button class="cal-cal${gcal.hiddenCals.includes(c.name) ? ' off' : ''}${calLoading.has(c.name) ? ' loading' : ''}" data-action="cal-toggle-cal" data-cal="${esc(c.name)}" style="--c:${normColor(c.color) || 'var(--gray-400)'}"><i></i>${esc(c.name)}${gcal.dinnerOnly.includes(c.name) ? `<small class="cal-cal-note">${DINNER_FROM}時〜</small>` : ''}</button>`).join('')
       + `</div>`;
     $('#cal-detail').innerHTML = `<div class="cal-detail"><div class="card flush">`
       + calsHTML
@@ -2942,8 +2948,11 @@ function cleanupLegacy_() {
     const last = ymd(new Date(new Date(e.end).getTime() - 1));
     return [s, addDays(last < s ? s : last, 1)];
   }
+  // 「ディナーの時間だけ」にしたカレンダーは、16時以降に始まる予定だけ出す（終日の予定は出さない）
+  const DINNER_FROM = 16;
+  const passesCalFilter = e => !gcal.dinnerOnly.includes(e.cal) || (!e.allDay && new Date(e.start).getHours() >= DINNER_FROM);
   function eventsOn(date) {
-    return gEvents.filter(e => { if (gcal.hiddenCals.includes(e.cal)) return false; const [a, b] = gEvSpan(e); return a <= date && date < b; })
+    return gEvents.filter(e => { if (gcal.hiddenCals.includes(e.cal) || !passesCalFilter(e)) return false; const [a, b] = gEvSpan(e); return a <= date && date < b; })
       .sort((x, y) => (y.allDay - x.allDay) || String(x.start).localeCompare(String(y.start)));
   }
   function gTimeLabel(e, date) {
@@ -3246,7 +3255,8 @@ function cleanupLegacy_() {
       $('#g-error').textContent = gcal.lastError || '';
       $('#g-tz').textContent = gcal.tzWarn || '';
       $('#g-cals').innerHTML = gcal.knownCals.length
-        ? `<div class="g-cals-title">TASKDOCK に表示するカレンダー</div>` + gcal.knownCals.map(c => `<label class="g-cal"><input type="checkbox" data-gcal-toggle="${esc(c.name)}"${gcal.hiddenCals.includes(c.name) ? '' : ' checked'}><span class="g-bar" style="background:${normColor(c.color)}"></span>${esc(c.name)}</label>`).join('')
+        ? `<div class="g-cals-title">TASKDOCK に表示するカレンダー</div>` + gcal.knownCals.map(c => `<div class="g-cal-row"><label class="g-cal"><input type="checkbox" data-gcal-toggle="${esc(c.name)}"${gcal.hiddenCals.includes(c.name) ? '' : ' checked'}><span class="g-bar" style="background:${normColor(c.color)}"></span>${esc(c.name)}</label>`
+          + `<label class="g-cal-dinner" title="夕方（${DINNER_FROM}時）以降に始まる予定だけ表示します"><input type="checkbox" data-gcal-dinner="${esc(c.name)}"${gcal.dinnerOnly.includes(c.name) ? ' checked' : ''}>ディナーの時間だけ（${DINNER_FROM}時〜）</label></div>`).join('')
         : '';
     } else {
       const code = $('#g-code');
@@ -3968,6 +3978,14 @@ function cleanupLegacy_() {
       else updateSale(sid, { [f]: t.value.trim() });
       return;
     }
+    if (t.matches('[data-gcal-dinner]')) {
+      const name = t.dataset.gcalDinner;
+      gcal.dinnerOnly = gcal.dinnerOnly.filter(n => n !== name);
+      if (t.checked) gcal.dinnerOnly.push(name);
+      saveG();
+      renderAll();
+      return;
+    }
     if (t.matches('[data-gcal-toggle]')) {
       const name = t.dataset.gcalToggle;
       gcal.hiddenCals = gcal.hiddenCals.filter(n => n !== name);
@@ -4252,7 +4270,7 @@ function cleanupLegacy_() {
       if (Array.isArray(v)) db[name] = v;
     } else if (k === KEYS.gcal) {
       const v = read(k, null);
-      if (v) { Object.keys(gcal).forEach(f => delete gcal[f]); Object.assign(gcal, { ...G_DEFAULTS }, v); ['pendingDeletes', 'knownCals', 'hiddenCals'].forEach(f => { if (!Array.isArray(gcal[f])) gcal[f] = []; }); }
+      if (v) { Object.keys(gcal).forEach(f => delete gcal[f]); Object.assign(gcal, { ...G_DEFAULTS }, v); ['pendingDeletes', 'knownCals', 'hiddenCals', 'dinnerOnly'].forEach(f => { if (!Array.isArray(gcal[f])) gcal[f] = []; }); }
     } else if (k === KEYS.gcalEvents) {
       const v = read(k, null); if (Array.isArray(v)) gEvents = v;
     } else if (k === KEYS.sales) {
