@@ -1230,6 +1230,10 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.10', date: '2026-11-04', items: [
+      'SOIL と自分のカレンダーを色分け：SOIL は緑のべた塗り、自分の予定は種類の色を薄く塗る形で区別',
+      'カレンダーの色を Settings で変更できるように',
+    ] },
     { v: '1.9', date: '2026-11-04', items: [
       'カレンダーごとに「ディナーの時間だけ（16時〜）」表示を選べるように（SOIL のカレンダー向け）',
     ] },
@@ -1617,7 +1621,7 @@ function cleanupLegacy_() {
   const saveUI = () => write(KEYS.ui, { collapsed: ui.collapsed, calView: ui.calView, hideTasks: !!ui.hideTasks });
 
   // Google カレンダー連携の状態
-  const G_DEFAULTS = { url: '', key: '', calendarId: null, account: '', lastSync: null, lastError: null, pendingDeletes: [], tzWarn: '', knownCals: [], hiddenCals: [], dinnerOnly: [] };
+  const G_DEFAULTS = { url: '', key: '', calendarId: null, account: '', lastSync: null, lastError: null, pendingDeletes: [], tzWarn: '', knownCals: [], hiddenCals: [], dinnerOnly: [], calColors: {} };
   const gcal = Object.assign({ ...G_DEFAULTS }, read(KEYS.gcal, {}) || {});
   ['pendingDeletes', 'knownCals', 'hiddenCals', 'dinnerOnly'].forEach(k => { if (!Array.isArray(gcal[k])) gcal[k] = []; });
   let gEvents = read(KEYS.gcalEvents, []);
@@ -1639,6 +1643,29 @@ function cleanupLegacy_() {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const pct = (a, b) => (b > 0 ? Math.min(100, Math.round((a / b) * 100)) : 0);
   const normColor = c => (/^#[0-9a-f]{6}$/i.test(c || '') ? c : '#64748b');
+  // カレンダーの色：Google 側が灰色でも見分けられるよう、TASKDOCK で色を決める（Settings で変更可）
+  const isHex = c => /^#[0-9a-f]{6}$/i.test(c || '');
+  const rgbOf = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+  const isGrayish = c => { const v = rgbOf(c); return Math.max(...v) - Math.min(...v) < 40; };
+  const inkOn = c => { const [r, g, b] = rgbOf(c); return (0.299 * r + 0.587 * g + 0.114 * b) > 170 ? '#1f1f1f' : '#fff'; };
+  const mainCal = () => (gEvents.find(e => e.mine) || {}).cal || '';
+  const isSoilCal = name => /soil/i.test(name || '');
+  const calLabel = name => (isSoilCal(name) ? 'SOIL' : name);
+  function calColor(name) {
+    const set = (gcal.calColors || {})[name];
+    if (isHex(set)) return set;
+    if (isSoilCal(name)) return '#0b8043';
+    if (name === mainCal()) return '#3f51b5';
+    const g = (gcal.knownCals.find(c => c.name === name) || {}).color;
+    return isHex(g) && !isGrayish(g) ? g : '#00897b';
+  }
+  const isOwnEv = e => !!e.mine || e.cal === mainCal();
+  // 自分の予定：種類の色を薄く塗る／ほかのカレンダー（SOIL など）：カレンダーの色でべた塗り
+  function evPaint(e) {
+    const own = isOwnEv(e);
+    const c = own && e.evColor && GCOLORS[e.evColor] ? GCOLORS[e.evColor].hex : calColor(e.cal);
+    return { c, own, style: own ? `background:${c}2e;box-shadow:inset 3px 0 0 ${c}` : `background:${c};color:${inkOn(c)}` };
+  }
   const findTask = id => db.tasks.find(t => t.id === id);
   const projectOf = id => (id ? db.projects.find(p => p.id === id) : null);
   const workTypeOf = id => (id ? db.workTypes.find(w => w.id === id) : null);
@@ -1965,7 +1992,7 @@ function cleanupLegacy_() {
     }).join('');
 
     const allday = days.map((d, i) => {
-      const chips = evAll[i].filter(e => e.allDay).map(e => { const c = normColor(e.color); return `<span class="tg-chip" ${evAttrs(e)} style="background:${c}26;box-shadow:inset 3px 0 0 ${c}" title="${esc(e.title)}（${esc(e.cal)}）">${esc(e.title || '（タイトルなし）')}</span>`; }).join('');
+      const chips = evAll[i].filter(e => e.allDay).map(e => { return `<span class="tg-chip" ${evAttrs(e)} style="${evPaint(e).style}" title="${esc(e.title)}（${esc(e.cal)}）">${esc(e.title || '（タイトルなし）')}</span>`; }).join('');
       const tasks = (ui.hideTasks ? [] : tasksOn(d)).map(t => `<button class="tg-chip tg-task${t.status === 'completed' ? ' done' : ''}" data-id="${t.id}" data-drag-task="${t.id}" data-action="toggle" title="${esc(t.title)}（クリックで完了/未完了・ドラッグで時間に入れる）"><i></i><span>${esc(t.title)}</span></button>`).join('');
       return `<div class="tg-ad" data-date="${d}">${chips}${tasks}</div>`;
     }).join('');
@@ -1987,11 +2014,10 @@ function cleanupLegacy_() {
       items.forEach(x => { if (cluster.length && x.s >= cEnd) flush(); cluster.push(x); cEnd = Math.max(cEnd, x.en); });
       flush();
       const evs = items.map(x => {
-        const c = normColor(x.e.color);
         const h = Math.max(18, (x.en - x.s) * HPX - 2);
         const w = 100 / x.lanes;
         const past = new Date(x.e.end).getTime() <= now.getTime();
-        return `<div class="tg-ev${h < 34 ? ' sm' : ''}${past ? ' past' : ''}" ${evAttrs(x.e)} style="top:${x.s * HPX + 1}px;height:${h}px;left:calc(${x.lane * w}% + 2px);width:calc(${w}% - 4px);background:${c}2e;box-shadow:inset 3px 0 0 ${c}" title="${esc(x.e.title)}（${esc(x.e.cal)}）">`
+        return `<div class="tg-ev${h < 34 ? ' sm' : ''}${past ? ' past' : ''}" ${evAttrs(x.e)} style="top:${x.s * HPX + 1}px;height:${h}px;left:calc(${x.lane * w}% + 2px);width:calc(${w}% - 4px);${evPaint(x.e).style}" title="${esc(x.e.title)}（${esc(x.e.cal)}）">`
           + `<b>${esc(x.e.title || '（タイトルなし）')}</b><span>${gTimeLabel(x.e, d)}</span>`
           + (x.e.mine && !x.e.rec ? `<i class="tg-resize" data-resize title="ドラッグで長さを変更"></i>` : '') + `</div>`;
       }).join('');
@@ -2032,7 +2058,7 @@ function cleanupLegacy_() {
       const tl = ui.hideTasks ? [] : [...list].sort((a, b) => (a.status === 'completed') - (b.status === 'completed'));
       const evs = gConnected() ? eventsOn(key) : [];
       const evHTML = evs.length
-        ? `<span class="cal-evs">${evs.slice(0, 2).map(e => { const c = normColor(e.color); return `<span class="cal-ev" style="--c:${c};--cb:${c}24">${esc(e.title || '予定')}</span>`; }).join('')}`
+        ? `<span class="cal-evs">${evs.slice(0, 2).map(e => { const pt = evPaint(e); return `<span class="cal-ev" style="${pt.own ? `--c:${pt.c};--cb:${pt.c}24` : pt.style + ';box-shadow:none'}">${esc(e.title || '予定')}</span>`; }).join('')}`
           + `${evs.length > 2 ? `<span class="cal-ev-more">+${evs.length - 2}</span>` : ''}</span>`
         : '';
       const tHTML = tl.length
@@ -2051,7 +2077,7 @@ function cleanupLegacy_() {
     const cals = gConnected() ? gcal.knownCals : [];
     const calsHTML = `<div class="cal-cals"><div class="cal-cals-title">表示するカレンダー（タップで切り替え）</div>`
       + `<button class="cal-cal${ui.hideTasks ? ' off' : ''}" data-action="cal-toggle-tasks" style="--c:var(--pri-500)"><i></i>タスク</button>`
-      + cals.map(c => `<button class="cal-cal${gcal.hiddenCals.includes(c.name) ? ' off' : ''}${calLoading.has(c.name) ? ' loading' : ''}" data-action="cal-toggle-cal" data-cal="${esc(c.name)}" style="--c:${normColor(c.color) || 'var(--gray-400)'}"><i></i>${esc(c.name)}${gcal.dinnerOnly.includes(c.name) ? `<small class="cal-cal-note">${DINNER_FROM}時〜</small>` : ''}</button>`).join('')
+      + cals.map(c => `<button class="cal-cal${gcal.hiddenCals.includes(c.name) ? ' off' : ''}${calLoading.has(c.name) ? ' loading' : ''}" data-action="cal-toggle-cal" data-cal="${esc(c.name)}" style="--c:${calColor(c.name)}" title="${esc(c.name)}"><i></i>${esc(calLabel(c.name))}${gcal.dinnerOnly.includes(c.name) ? `<small class="cal-cal-note">${DINNER_FROM}時〜</small>` : ''}</button>`).join('')
       + `</div>`;
     $('#cal-detail').innerHTML = `<div class="cal-detail"><div class="card flush">`
       + calsHTML
@@ -2185,18 +2211,18 @@ function cleanupLegacy_() {
     }
     const now = Date.now();
     const nextIdx = timed.findIndex(e => new Date(e.start).getTime() > now);
-    const chips = allDay.map(e => { const c = normColor(e.color); return `<span class="sch-chip" style="background:${c}24;box-shadow:inset 3px 0 0 ${c}" title="${esc(e.title)}（${esc(e.cal)}）">${esc(e.title || '（タイトルなし）')}</span>`; }).join('');
+    const chips = allDay.map(e => { return `<span class="sch-chip" style="${evPaint(e).style}" title="${esc(e.title)}（${esc(e.cal)}）">${esc(e.title || '（タイトルなし）')}</span>`; }).join('');
     const items = timed.map((e, i) => {
       const st = new Date(e.start), en = new Date(e.end);
       const state = en.getTime() <= now ? 'past' : st.getTime() <= now ? 'now' : i === nextIdx ? 'next' : '';
       const mins = Math.round((st.getTime() - now) / 60000);
       const badge = state === 'now' ? '<span class="sch-badge">進行中</span>'
         : state === 'next' ? `<span class="sch-badge">${mins < 60 ? `あと${mins}分` : `あと${Math.floor(mins / 60)}時間${mins % 60 ? `${mins % 60}分` : ''}`}</span>` : '';
-      const c = normColor(e.color);
+      const pt = evPaint(e);
       return `<div class="sch-item ${state}" ${evAttrs(e)} title="${esc(e.title)}（${esc(e.cal)}）">`
         + `<div class="sch-time">${ymd(st) === td ? hm(st) : '…'}<small>${ymd(en) === td ? hm(en) : '…'}</small></div>`
-        + `<span class="sch-bar" style="background:${c}"></span>`
-        + `<div class="sch-main"><div class="sch-title">${badge}${esc(e.title || '（タイトルなし）')}</div><div class="sch-meta">${esc(evTypeOf(e.type) ? evTypeOf(e.type).label : e.cal)}${e.loc ? ` ・ ${esc(e.loc)}` : ''}</div></div></div>`;
+        + `<span class="sch-bar" style="background:${pt.c}${pt.own ? '' : ';width:6px'}"></span>`
+        + `<div class="sch-main"><div class="sch-title">${badge}${esc(e.title || '（タイトルなし）')}</div><div class="sch-meta"${pt.own ? '' : ` style="color:${pt.c};font-weight:600"`}>${esc(evTypeOf(e.type) ? evTypeOf(e.type).label : calLabel(e.cal))}${e.loc ? ` ・ ${esc(e.loc)}` : ''}</div></div></div>`;
     }).join('');
     const allPast = timed.length && timed.every(e => new Date(e.end).getTime() <= now);
     box.innerHTML = (chips ? `<div class="sch-allday">${chips}</div>` : '') + items + (allPast ? '<div class="sch-done">今日の予定はすべて終わりました</div>' : '');
@@ -2323,7 +2349,7 @@ function cleanupLegacy_() {
     const dot = $('#ev-type-dot'), sel = $('#ev-type');
     if (!dot || !sel) return;
     const ty = evTypeOf(sel.value);
-    dot.style.background = ty ? (GCOLORS[ty.colorId] || GCOLORS[8]).hex : (evEditing && evEditing.color ? normColor(evEditing.color) : 'var(--gray-300)');
+    dot.style.background = ty ? (GCOLORS[ty.colorId] || GCOLORS[8]).hex : (evEditing ? evPaint(evEditing).c : 'var(--gray-300)');
   }
   function applyTemplate(id) {
     const t = evTemplates.find(x => x.id === id);
@@ -2965,10 +2991,10 @@ function cleanupLegacy_() {
     const evs = eventsOn(date);
     if (!evs.length) return '';
     return `<div class="g-list">${evs.map(e => {
-      const c = normColor(e.color);
-      return `<div class="g-ev" ${evAttrs(e)} title="${esc(e.title)}（${esc(e.cal)}）"><span class="g-bar" style="background:${c}"></span>`
+      const pt = evPaint(e);
+      return `<div class="g-ev" ${evAttrs(e)} title="${esc(e.title)}（${esc(e.cal)}）"><span class="g-bar" style="background:${pt.c}${pt.own ? '' : ';width:6px'}"></span>`
         + `<span class="g-time">${gTimeLabel(e, date)}</span><span class="g-title">${esc(e.title || '（タイトルなし）')}</span>`
-        + `<span class="g-src">${esc(e.cal)}</span></div>`;
+        + `<span class="g-src"${pt.own ? '' : ` style="color:${pt.c};font-weight:600"`}>${esc(calLabel(e.cal))}</span></div>`;
     }).join('')}</div>`;
   }
 
@@ -3255,7 +3281,7 @@ function cleanupLegacy_() {
       $('#g-error').textContent = gcal.lastError || '';
       $('#g-tz').textContent = gcal.tzWarn || '';
       $('#g-cals').innerHTML = gcal.knownCals.length
-        ? `<div class="g-cals-title">TASKDOCK に表示するカレンダー</div>` + gcal.knownCals.map(c => `<div class="g-cal-row"><label class="g-cal"><input type="checkbox" data-gcal-toggle="${esc(c.name)}"${gcal.hiddenCals.includes(c.name) ? '' : ' checked'}><span class="g-bar" style="background:${normColor(c.color)}"></span>${esc(c.name)}</label>`
+        ? `<div class="g-cals-title">TASKDOCK に表示するカレンダー</div>` + gcal.knownCals.map(c => `<div class="g-cal-row"><label class="g-cal"><input type="checkbox" data-gcal-toggle="${esc(c.name)}"${gcal.hiddenCals.includes(c.name) ? '' : ' checked'}>${esc(c.name)}</label><label class="swatch" style="background:${calColor(c.name)}" title="色を変更"><input type="color" value="${calColor(c.name)}" data-cal-color="${esc(c.name)}" aria-label="${esc(c.name)}の色"></label>`
           + `<label class="g-cal-dinner" title="夕方（${DINNER_FROM}時）以降に始まる予定だけ表示します"><input type="checkbox" data-gcal-dinner="${esc(c.name)}"${gcal.dinnerOnly.includes(c.name) ? ' checked' : ''}>ディナーの時間だけ（${DINNER_FROM}時〜）</label></div>`).join('')
         : '';
     } else {
@@ -3976,6 +4002,12 @@ function cleanupLegacy_() {
       const f = t.dataset.saleField;
       if (f === 'amount') { const n = parseInt(String(t.value).replace(/[^\d]/g, ''), 10); updateSale(sid, { amount: n > 0 ? n : null }); }
       else updateSale(sid, { [f]: t.value.trim() });
+      return;
+    }
+    if (t.matches('[data-cal-color]')) {
+      gcal.calColors = { ...(gcal.calColors || {}), [t.dataset.calColor]: normColor(t.value) };
+      saveG();
+      renderAll();
       return;
     }
     if (t.matches('[data-gcal-dinner]')) {
