@@ -782,6 +782,17 @@ a.sale-title:hover { text-decoration: underline; }
 .io-text { flex: 1 1 260px; display: grid; gap: 2px; font-size: 13px; }
 .io-text span { color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
 .io-btns { display: flex; gap: 8px; }
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 12px 6px; padding: 6px 0 2px; }
+.app-item { display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); min-width: 0; -webkit-tap-highlight-color: transparent; }
+.app-icon { position: relative; width: 48px; height: 48px; border-radius: 12px; background: hsl(var(--h) 45% 92%); box-shadow: 0 1px 2px rgba(0,0,0,.06), inset 0 0 0 1px rgba(0,0,0,.05); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: transform .15s ease; }
+.app-icon b { font-size: 20px; font-weight: 700; color: hsl(var(--h) 40% 35%); }
+.app-icon img { position: absolute; inset: 0; margin: auto; width: 28px; height: 28px; background: #fff; border-radius: 6px; }
+.app-icon:has(img) { background: #fff; }
+.app-item:hover .app-icon { transform: translateY(-2px); }
+.app-item:active .app-icon { transform: scale(.94); }
+.app-name { font-size: 11px; line-height: 1.3; max-width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-cal.loading { opacity: .7; }
+.cal-cal.loading::after { content: '読み込み中…'; font-size: 10px; color: var(--gray-500); }
 .links .link-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px 0 2px; }
 .link-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--gray-100); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--ink); text-decoration: none; min-width: 0; transition: background var(--ease); }
 .link-item:hover { background: var(--gray-50); }
@@ -857,7 +868,7 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
   .schedule { order: 2; margin-bottom: 12px !important; }
   .quick { order: 3; }
   #task-area { order: 4; }
-  .notes { order: 5; margin-top: 4px; }
+  .notes, .links { order: 5; margin-top: 4px; }
   .toast { bottom: calc(76px + env(safe-area-inset-bottom)); }
   .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .cal-legend { display: none; }
@@ -957,7 +968,7 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
       </section>
 
       <section class="card links" aria-label="リンク">
-        <div class="schedule-head"><span class="schedule-title">リンク</span><span class="schedule-count"></span><button class="btn btn-outline btn-xs" data-action="link-edit" id="link-edit-btn">編集</button></div>
+        <div class="schedule-head"><span class="schedule-title">アプリ</span><span class="schedule-count"></span><button class="btn btn-outline btn-xs" data-action="link-edit" id="link-edit-btn">編集</button></div>
         <div id="link-list"></div>
       </section>
       </div>
@@ -1216,6 +1227,10 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.8', date: '2026-11-04', items: [
+      'リンクをアプリのアイコン風に（サイトのロゴ付き）',
+      '隠していたカレンダー（soil など）を表示に戻したとき、すぐに予定が出るように',
+    ] },
     { v: '1.7', date: '2026-11-03', items: [
       'Notes をなくして、仕事で使うサイト（Slack など）へのリンクを追加',
       'タスクの完了数・進み具合の表示をなくしてすっきり',
@@ -2030,7 +2045,7 @@ function cleanupLegacy_() {
     const cals = gConnected() ? gcal.knownCals : [];
     const calsHTML = `<div class="cal-cals"><div class="cal-cals-title">表示するカレンダー（タップで切り替え）</div>`
       + `<button class="cal-cal${ui.hideTasks ? ' off' : ''}" data-action="cal-toggle-tasks" style="--c:var(--pri-500)"><i></i>タスク</button>`
-      + cals.map(c => `<button class="cal-cal${gcal.hiddenCals.includes(c.name) ? ' off' : ''}" data-action="cal-toggle-cal" data-cal="${esc(c.name)}" style="--c:${normColor(c.color) || 'var(--gray-400)'}"><i></i>${esc(c.name)}</button>`).join('')
+      + cals.map(c => `<button class="cal-cal${gcal.hiddenCals.includes(c.name) ? ' off' : ''}${calLoading.has(c.name) ? ' loading' : ''}" data-action="cal-toggle-cal" data-cal="${esc(c.name)}" style="--c:${normColor(c.color) || 'var(--gray-400)'}"><i></i>${esc(c.name)}</button>`).join('')
       + `</div>`;
     $('#cal-detail').innerHTML = `<div class="cal-detail"><div class="card flush">`
       + calsHTML
@@ -2400,9 +2415,22 @@ function cleanupLegacy_() {
       return;
     }
     box.innerHTML = links.length
-      ? `<div class="link-grid">${links.map(l => `<a class="link-item" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" title="${esc(l.url)}"><b class="link-mark">${esc((l.name || '?').slice(0, 1))}</b><span>${esc(l.name)}</span></a>`).join('')}</div>`
+      ? `<div class="app-grid">${links.map(l => {
+          const host = linkHost(l.url);
+          const icon = host ? `<img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64" alt="" loading="lazy" onerror="this.remove()">` : '';
+          return `<a class="app-item" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener" title="${esc(l.url)}"><span class="app-icon" style="--h:${hueOf(l.name)}"><b>${esc((l.name || '?').slice(0, 1))}</b>${icon}</span><span class="app-name">${esc(l.name)}</span></a>`;
+        }).join('')}</div>`
       : `<div class="links-empty">「編集」からよく使うサイトを追加できます</div>`;
   }
+  // アイコン：サイトのロゴ（取れなければ頭文字）
+  const APP_HOSTS = { slack: 'slack.com', notion: 'notion.so', figma: 'figma.com', claude: 'claude.ai' };
+  function linkHost(u) {
+    const m = /^([a-z][a-z0-9+.-]*):/i.exec(u || '');
+    if (!m) return '';
+    if (/^https?$/i.test(m[1])) { try { return new URL(u).hostname; } catch (e) { return ''; } }
+    return APP_HOSTS[m[1].toLowerCase()] || '';
+  }
+  const hueOf = str => [...String(str)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
   function addLink() {
     const name = $('#link-name').value.trim();
     let url = $('#link-url').value.trim();
@@ -2847,6 +2875,7 @@ function cleanupLegacy_() {
     recurring: '繰り返しの予定は Google カレンダーで編集してください。',
   };
   let gBusy = false, gQueued = false, gTimer = null, gLastRange = null;
+  const calLoading = new Set(); // 表示に戻して、取り直し中のカレンダー
 
   function ensureKey() {
     if (!gcal.key) {
@@ -2967,7 +2996,7 @@ function cleanupLegacy_() {
   });
 
   // --- 取り込み（Google → TASKDOCK） ---
-  function applyPull(data, range) {
+  function applyPull(data, range, skipped = []) {
     const stats = { imported: 0, updated: 0, removed: [] };
 
     // TASKDOCK カレンダーが作り直された → 対応づけをリセットして全件送り直す
@@ -2978,7 +3007,8 @@ function cleanupLegacy_() {
     gcal.calendarId = data.calendarId;
 
     gEvents = gEvents
-      .filter(e => { const [a, b] = gEvSpan(e); return !(a <= range.to && b > range.from); })
+      // 非表示で読まなかったカレンダーの予定は手元に残す（表示に戻したときにすぐ出せるように）
+      .filter(e => { if (skipped.includes(e.cal)) return true; const [a, b] = gEvSpan(e); return !(a <= range.to && b > range.from); })
       .concat((data.events || []).map(normalizeGEvent));
     (data.events || []).forEach(e => {
       if (e.cal && !gcal.knownCals.some(c => c.name === e.cal)) gcal.knownCals.push({ name: e.cal, color: e.color || '' });
@@ -3142,9 +3172,10 @@ function cleanupLegacy_() {
     setGUI();
     const range = gRange();
     try {
-      const pulled = await gCall('pull', { ...range, skip: gcal.hiddenCals });
+      const skipped = [...gcal.hiddenCals];
+      const pulled = await gCall('pull', { ...range, skip: skipped });
       if (!gConnected()) return; // 同期中に連携解除された
-      const st = applyPull(pulled, range);
+      const st = applyPull(pulled, range, skipped);
       gLastRange = range;
       const failed = await gPush(range);
       // 以前の方式（終日予定）で入れたタスクを1回だけ片付ける
@@ -3184,6 +3215,7 @@ function cleanupLegacy_() {
       try { localStorage.removeItem('taskdock_gcalLock'); } catch (e) {}
       setGUI();
       if (!editing) renderAll(); else renderHero();
+      calLoading.clear();
       if (gQueued) { gQueued = false; scheduleGSync(300); }
     }
   }
@@ -3785,7 +3817,7 @@ function cleanupLegacy_() {
         gcal.hiddenCals = gcal.hiddenCals.filter(n => n !== name);
         if (!off) gcal.hiddenCals.push(name);
         saveG(); renderAll();
-        if (off) scheduleGSync(200); // 隠していたカレンダーは取り直す
+        if (off) { calLoading.add(name); if (gBusy) gQueued = true; else scheduleGSync(200); renderCalendar(); } // 隠していたカレンダーは取り直す
         break;
       }
       case 'link-edit': linkEditing = !linkEditing; renderLinks(); break;
