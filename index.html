@@ -383,12 +383,12 @@ button.sec-head:hover { background: var(--gray-50); }
 .tg-gut { font-size: 10px; color: var(--gray-400); text-align: right; padding: 7px 6px 0 0; }
 .tg-ad { border-left: 1px solid var(--gray-100); padding: 4px; display: flex; flex-direction: column; gap: 2px; min-height: 30px; min-width: 0; }
 .tg-chip { font-size: 11px; line-height: 19px; padding: 0 6px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; color: var(--ink); min-width: 0; }
-.tg-task { display: flex; align-items: center; gap: 5px; background: var(--gray-100); width: 100%; transition: background var(--ease); }
-.tg-task:hover { background: var(--gray-200); }
-.tg-task i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--gray-400); flex-shrink: 0; }
+.tg-task { display: flex; align-items: center; gap: 5px; background: #7a1f3d; color: #fff; width: 100%; transition: filter var(--ease); }
+.tg-task:hover { filter: brightness(1.15); }
+.tg-task i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.8); flex-shrink: 0; }
 .tg-task span { overflow: hidden; text-overflow: ellipsis; }
-.tg-task.done { color: var(--gray-400); text-decoration: line-through; }
-.tg-task.done i { background: var(--green-500); border-color: var(--green-500); }
+.tg-task.done { opacity: .5; text-decoration: line-through; }
+.tg-task.done i { background: #fff; border-color: #fff; }
 .tg-body { max-height: 600px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--gray-300) transparent; }
 .tg-grid { height: calc(24 * 48px); position: relative; }
 .tg-gutcol { position: relative; }
@@ -829,10 +829,10 @@ a.sale-title:hover { text-decoration: underline; }
 .cal-cal.off { color: var(--gray-400); background: var(--gray-50); }
 .cal-cal.off i { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
 .cal-tasks { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; min-width: 0; }
-.cal-task { font-size: 10px; line-height: 13px; padding-left: 12px; position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink); text-align: left; }
-.cal-task::before { content: ''; position: absolute; left: 2px; top: 3px; width: 6px; height: 6px; border-radius: 50%; box-shadow: inset 0 0 0 1.2px var(--gray-500); }
-.cal-task.done { color: var(--gray-400); text-decoration: line-through; }
-.cal-task.done::before { background: var(--green-500); box-shadow: none; }
+.cal-task { font-size: 10px; line-height: 15px; padding: 0 4px 0 13px; border-radius: 3px; background: #7a1f3d; position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; text-align: left; }
+.cal-task::before { content: ''; position: absolute; left: 4px; top: 4px; width: 6px; height: 6px; border-radius: 50%; box-shadow: inset 0 0 0 1.2px rgba(255,255,255,.85); }
+.cal-task.done { opacity: .5; text-decoration: line-through; }
+.cal-task.done::before { background: #fff; box-shadow: none; }
 /* タスクのドラッグ（マウス・指の両方） */
 .handle { touch-action: none; cursor: grab; }
 .drag-ghost { position: fixed; z-index: 400; pointer-events: none; padding: 6px 12px; border-radius: 8px; background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.18); font-size: 13px; font-weight: 500; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: translate(12px, -50%); }
@@ -1230,6 +1230,9 @@ body.task-dragging, body.task-dragging * { cursor: grabbing !important; user-sel
   /* ================= Constants ================= */
   // バージョン：新しい機能を足したら先頭に追加して上げる
   const CHANGELOG = [
+    { v: '1.14', date: '2026-11-05', items: [
+      'カレンダーのタスクをワイン色に。タスクをドラッグして作った予定もワイン色',
+    ] },
     { v: '1.13', date: '2026-11-04', items: [
       '種類（ご飯・仕事など）を付けた予定は、その色で表示。種類なしの予定はグレー、SOIL は緑',
     ] },
@@ -1674,7 +1677,7 @@ function cleanupLegacy_() {
     const own = isOwnEv(e);
     const ty = own ? evTypeOf(e.type) : null;
     const cat = own ? (GCOLORS[e.evColor] || (ty && GCOLORS[ty.colorId])) : null;
-    const c = cat ? cat.hex : calColor(e.cal);
+    const c = own && e.type === 'task' ? '#7a1f3d' : cat ? cat.hex : calColor(e.cal); // タスクから作った予定はワイン
     return { c, own, style: `background:${c};color:${inkOn(c)}` };
   }
   const findTask = id => db.tasks.find(t => t.id === id);
@@ -2087,7 +2090,7 @@ function cleanupLegacy_() {
     // Google カレンダーのように、表示するカレンダーをタップで切り替え
     const cals = gConnected() ? gcal.knownCals : [];
     const calsHTML = `<div class="cal-cals"><div class="cal-cals-title">表示するカレンダー（タップで切り替え）</div>`
-      + `<button class="cal-cal${ui.hideTasks ? ' off' : ''}" data-action="cal-toggle-tasks" style="--c:var(--pri-500)"><i></i>タスク</button>`
+      + `<button class="cal-cal${ui.hideTasks ? ' off' : ''}" data-action="cal-toggle-tasks" style="--c:#7a1f3d"><i></i>タスク</button>`
       + cals.map(c => `<button class="cal-cal${gcal.hiddenCals.includes(c.name) ? ' off' : ''}${calLoading.has(c.name) ? ' loading' : ''}" data-action="cal-toggle-cal" data-cal="${esc(c.name)}" style="--c:${calColor(c.name)}" title="${esc(c.name)}"><i></i>${esc(calLabel(c.name))}${gcal.dinnerOnly.includes(c.name) ? `<small class="cal-cal-note">${DINNER_FROM}時〜</small>` : ''}</button>`).join('')
       + `</div>`;
     $('#cal-detail').innerHTML = `<div class="cal-detail"><div class="card flush">`
@@ -2402,7 +2405,7 @@ function cleanupLegacy_() {
     if (!title) { msg.textContent = 'タイトルを入れてください'; $('#ev-title').focus(); return; }
     if (!date) { msg.textContent = '日付を入れてください'; return; }
     if (!allDay && (!st || !en || en <= st)) { msg.textContent = '終了時刻は開始時刻より後にしてください'; return; }
-    const typeId = $('#ev-type').value;
+    const typeId = $('#ev-type').value || (evEditing && evEditing.type === 'task' ? 'task' : '');
     const ty = evTypeOf(typeId);
     const payload = {
       id: evEditing ? evEditing.id : undefined, title, allDay, date, start: `${date}T${st}`, end: `${date}T${en}`,
@@ -4180,7 +4183,7 @@ function cleanupLegacy_() {
     if (t.scheduledDate !== date) moveTask(t.id, date, null);
     renderAll();
     if (!gConnected()) { toast('タスクを移しました（時間に入れるには Google カレンダー連携が必要です）'); return; }
-    const payload = { title: t.title, allDay: false, date, start: `${date}T${qTime(q)}`, end: `${date}T${qTime(Math.min(95, q + 4))}`, loc: '', desc: 'TASKDOCK のタスクから作成', type: '', colorId: '' };
+    const payload = { title: t.title, allDay: false, date, start: `${date}T${qTime(q)}`, end: `${date}T${qTime(Math.min(95, q + 4))}`, loc: '', desc: 'TASKDOCK のタスクから作成', type: 'task', colorId: '3' }; // Google の色にワインがないので一番近いブドウ
     try {
       const res = await gCall('createEvent', { event: payload });
       gEvents.push(normalizeGEvent(res.event));
